@@ -18,6 +18,7 @@ The [plugins.md](plugins.md) contains an auto-generated list of all available pl
 ## Usage
 
 - We recommend using [NixNeovim](https://github.com/NixNeovim/NixNeovim), and only access the plugins directly when they do not have a module in NixNeovim.
+- Sometimes, a new plugin has the same name as an existing one. In this case, we rename both plugins to `<plugin-name>-<owner>`, introducing a breaking change. Therefore, again: We recommend using NixNeovim, and not this repo directly.
 
 However, you can also use this repo without NixNeovim:
 To access the plugins, you need to add the overlay.
@@ -58,17 +59,19 @@ More info on using neovim with nix can be found here: [NixOS Neovim](https://nix
 
 ### How to add a new plugin
 
-#### 1. Add the plugin to manifest.txt:
+#### 1. Add the plugin to manifest.yaml:
+
+The new yaml format has the following format
 
 ```
-# Examples
-
-haringsrob/nvim_context_vt
-sourcehut:henriquehbr/ataraxis.lua
-gitlab:yorickpeterse/nvim-pqf
-williamboman/mason.nvim:45b9a4da776d9fb017960b3ac7241161fb7bc578 
-foo/bar::baz                   --> renamed to baz
-foo/bar:dev                    --> using dev branch
+- owner: nvim-telescope
+  repo: telescope.nvim
+  # the following keys are optional
+  branch: ... # explicitly select branch
+  custom_name: ... # set custom name, used to fix name clashes
+  license: ... # specify license
+  commit: ... # specify commit to use, can be used when newest version is broken
+  warning: ... # add a waning that will be displayed when using the plugin, will also be visible in plugins.md
 ```
 
 Supported are Github (default), SourceHut, and GitLab.
@@ -76,15 +79,17 @@ Supported are Github (default), SourceHut, and GitLab.
 #### 2. Create a Pull Request
 
 - Create a pull request with the changed manifest.txt (and blacklist.txt if neccessary).
-- A GitHub action will check your contribution and generate all neccessary nix code for your new plugin. It will also take care of sorting and cleaning the manifest.txt
+- A GitHub action will check your contribution and generate all neccessary nix code for your new plugin. It will also take care of sorting and cleaning the manifest.yaml
 - After all checks have passed, I will merge your change.
 
 I am happy for any contribution. :)
 
 ### How to remove a new plugin
 
-Copy the entry from manifest.txt to blacklist.txt and create a PR.
-The GitHub Actions will do the rest, including removing the entry from manifest.txt
+this contains old information. Just open an issue for now
+
+Copy the entry from manifest.yaml to blocklist.yaml and create a PR.
+The GitHub Actions will do the rest, including removing the entry from manifest.yaml
 
 ## Credits
 
