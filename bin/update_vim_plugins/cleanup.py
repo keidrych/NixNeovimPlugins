@@ -11,14 +11,15 @@ class CleanUpCommand(Command):
         """Main command function"""
 
         # all cleaning up will be done during reading and writing automatically
-        manifest = read_manifest_to_spec()
-        blacklist = read_blacklist_to_spec()
+        #  manifest = read_manifest_to_spec()
+        manifest = read_manifest_yaml_to_spec()
+        blacklist = read_blocklist_yaml_to_spec()
 
         new_manifest = [ spec for spec in manifest if spec not in blacklist ]
 
         new_manifest_filterd = self.filter_renamed(new_manifest)
 
-        write_manifest_from_spec(new_manifest_filterd)
+        write_manifest_yaml_from_spec(new_manifest_filterd)
 
         self.line("<comment>Done</comment>")
 
@@ -63,25 +64,31 @@ class CleanUpCommand(Command):
 
                     if error_props_lower or error_props_lower2 or error_props or error_source:
                         self.line(f" • <error>Cannot determine which is the correct plugin</error>")
-                        self.line(f" - {p.line}")
-                        self.line(f" - {p2.line}")
+                        #  self.line(f" - {p.id} ({p.repository_host})")
+                        #  self.line(f" - {p2.id} ({p2.repository_host})")
+                        p_yaml = p.to_yaml().split("\n")
+                        p_s = p_yaml[0] + "\n" + "\n".join([ "   " + line.strip() for line in p_yaml[1:]])
+                        self.line(f" - {p_s}")
+                        p2_yaml = p2.to_yaml().split("\n")
+                        p2_s = p2_yaml[0] + "\n" + "\n".join([ "   " + line.strip() for line in p2_yaml[1:]])
+                        self.line(f" - {p2_s}")
                         error = True
                         # remove second spec to not encounter the error twice
                         # this will not be written to the manifest.txt because we set
                         # the error flag and will exit after the loop
                         specs.remove(p2)
                     elif select_p:
-                        self.line(f" - <comment>{p.line}</comment>")
-                        self.line(f" - {p2.line}")
+                        self.line(f" - <comment>{p.id}</comment>")
+                        self.line(f" - {p2.id}")
                         specs.remove(p2)
                     elif select_p2:
-                        self.line(f" - {p.line}")
-                        self.line(f" - <comment>{p2.line}</comment>")
+                        self.line(f" - {p.id}")
+                        self.line(f" - <comment>{p2.id}</comment>")
                         specs.remove(p)
                     else:
                         self.line(f" • <error>Logic error in correct spec determination</error>")
-                        self.line(f" - {p.line}")
-                        self.line(f" - {p2.line}")
+                        self.line(f" - {p.id}")
+                        self.line(f" - {p2.id}")
                         error = True
                         # remove second spec to not encounter the error twice
                         # this will not be written to the manifest.txt because we set
